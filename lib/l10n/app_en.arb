@@ -1,0 +1,109 @@
+{
+  "@@locale": "en",
+  "appName": "LTO Exam Coach",
+  "appTagline": "Philippines Driver's License Reviewer",
+  "navHome": "Home",
+  "navPractice": "Practice",
+  "navMockTest": "Mock Exam",
+  "navRoadSigns": "Road Signs",
+  "navProgress": "Progress",
+  "greetingTitle": "Ready to practice?",
+  "preparingForPrefix": "Preparing for: ",
+  "continuePractice": "Continue Practice",
+  "questionsLeftToReview": "{count} Questions Left to Review",
+  "@questionsLeftToReview": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "allQuestionsCompleted": "All 150 Questions Completed!",
+  "startPractice": "Start Practice",
+  "todaysSummary": "Today's Summary",
+  "today": "Today",
+  "accuracy": "Accuracy",
+  "streak": "Streak",
+  "dayUnit": "Day",
+  "daysUnit": "Days",
+  "studyModesTitle": "Study Modes & Review",
+  "modePracticeTitle": "Practice Questions",
+  "modePracticeDesc": "Topic Practice",
+  "modeMockExamTitle": "Mock Exam",
+  "modeMockExamDesc": "Timed Simulation",
+  "modeWrongAnswersTitle": "Wrong Answers",
+  "modeWrongAnswersDesc": "Mistake Bank",
+  "modeFavoritesTitle": "Favorites",
+  "modeFavoritesDesc": "Saved Questions",
+  "modeDifficultTitle": "Difficult Questions",
+  "modeDifficultDesc": "Flagged Questions",
+  "modeRoadSignsTitle": "Road Signs",
+  "modeRoadSignsDesc": "45 Visual Signs",
+  "modeProgressTitle": "Progress & Analytics",
+  "modeProgressDesc": "Analytics & Streak",
+  "tipOfTheDayPrefix": "Tip of the Day: ",
+  "legalDisclaimerCompact": "Independent study reviewer. Not affiliated with or endorsed by the Land Transportation Office (LTO).",
+  "settingsTitle": "Settings",
+  "sectionGeneral": "GENERAL",
+  "sectionStudy": "STUDY",
+  "sectionAbout": "ABOUT",
+  "settingLanguage": "Language",
+  "languageEnglish": "English",
+  "languageFilipino": "Filipino",
+  "settingDarkTheme": "Dark Theme",
+  "settingDarkThemeDesc": "Toggle app dark mode appearance",
+  "settingDailyReminder": "Daily Study Reminder",
+  "settingDailyReminderDesc": "Get notified to practice every day",
+  "settingVehicleCategory": "Vehicle Category",
+  "settingVehicleCategoryDesc": "Personalize practice for your target license",
+  "settingDailyGoal": "Daily Practice Goal",
+  "settingDailyGoalDesc": "{count} Questions per day",
+  "@settingDailyGoalDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingAppVersion": "App Version",
+  "settingAboutLegal": "About & Legal Disclaimer",
+  "settingPrivacyPolicy": "Privacy Policy",
+  "settingPrivacyPolicyDesc": "Information on offline data and privacy",
+  "settingAdPrivacy": "Ad Privacy & Consent",
+  "settingAdPrivacyDesc": "Manage your advertising & consent preferences",
+  "settingResetProgress": "Reset Practice Progress",
+  "settingResetProgressDesc": "Clear practice statistics, category accuracy, and streak",
+  "practiceByTopic": "Practice by Topic",
+  "allQuestions": "All Questions",
+  "questionNumber": "Question {current} of {total}",
+  "@questionNumber": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "correct": "Correct!",
+  "incorrect": "Incorrect",
+  "explanation": "Explanation",
+  "nextQuestion": "Next Question",
+  "finishPractice": "Finish Practice",
+  "practiceComplete": "Practice Complete!",
+  "practiceAgain": "Practice Again",
+  "backToTopics": "Back to Topics",
+  "mockExam": "Mock Exam",
+  "practiceBenchmarkNotice": "80% Practice Benchmark",
+  "mockExamSubtitle": "Timed practice examination for driver's license preparation.",
+  "startMockExam": "Start Mock Exam",
+  "questionsCount20": "20 Questions",
+  "questionsCount30": "30 Questions",
+  "timeRemaining": "Time Remaining",
+  "submitExam": "Submit Exam",
+  "practiceResult": "Practice Result",
+  "reviewAnswers": "Review Answers",
+  "tryAgain": "Try Again",
+  "backToHome": "Back to Home"
+}
