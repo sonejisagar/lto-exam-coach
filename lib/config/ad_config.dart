@@ -80,8 +80,8 @@ class AdConfig {
   /// - Must be a valid HTTPS URL with a valid SSL certificate.
   /// - Must match the exact URL entered into Google Play Console.
   /// - Kept null until published by the developer. Do NOT enter a fake URL.
-  /// - When null, the app displays an informative in-app privacy & offline data dialog.
-  static const String? privacyPolicyUrl = null;
+  static const String privacyPolicyUrl =
+      'https://sonejisagar.github.io/lto-exam-coach/';
 
   // ===========================================================================
   // PRODUCTION READINESS & VALIDATION
@@ -100,7 +100,7 @@ class AdConfig {
     if (prodAndroidInterstitialId.isEmpty) {
       pending.add('Production Android Interstitial Unit ID (prodAndroidInterstitialId)');
     }
-    if (privacyPolicyUrl == null || privacyPolicyUrl!.isEmpty) {
+    if (privacyPolicyUrl.isEmpty) {
       pending.add('Publicly hosted Privacy Policy URL (privacyPolicyUrl)');
     }
     return pending;

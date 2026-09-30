@@ -151,7 +151,7 @@ class SettingsScreen extends StatelessWidget {
                     title: const Text('Privacy Policy'),
                     subtitle: const Text('Information on offline data and privacy'),
                     trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => _handlePrivacyPolicyTap(context),
+                    onTap: () => _showPrivacyPolicyDialog(context),
                   ),
                   const Divider(height: 1),
                   ListTile(
@@ -325,22 +325,6 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _handlePrivacyPolicyTap(BuildContext context) async {
-    final url = AdConfig.privacyPolicyUrl;
-    if (url != null && url.isNotEmpty && url.startsWith('https://')) {
-      final uri = Uri.parse(url);
-      try {
-        final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
-        if (launched) return;
-      } catch (_) {
-        // Fallback to dialog if external launch is unavailable
-      }
-    }
-    if (context.mounted) {
-      _showPrivacyPolicyDialog(context);
-    }
-  }
-
   void _showPrivacyPolicyDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -381,9 +365,8 @@ class SettingsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                AdConfig.privacyPolicyUrl != null &&
-                        AdConfig.privacyPolicyUrl!.isNotEmpty &&
-                        AdConfig.privacyPolicyUrl!.startsWith('https://')
+                AdConfig.privacyPolicyUrl.isNotEmpty &&
+                        AdConfig.privacyPolicyUrl.startsWith('https://')
                     ? 'Our complete online privacy policy can be viewed at: ${AdConfig.privacyPolicyUrl}'
                     : 'The production Privacy Policy webpage source is included in docs/privacy_policy.html. Deploy it to a public HTTPS host and configure AdConfig.privacyPolicyUrl before Google Play Store submission.',
               ),
@@ -391,14 +374,13 @@ class SettingsScreen extends StatelessWidget {
           ),
         ),
         actions: [
-          if (AdConfig.privacyPolicyUrl != null &&
-              AdConfig.privacyPolicyUrl!.isNotEmpty &&
-              AdConfig.privacyPolicyUrl!.startsWith('https://'))
+          if (AdConfig.privacyPolicyUrl.isNotEmpty &&
+              AdConfig.privacyPolicyUrl.startsWith('https://'))
             TextButton.icon(
               icon: const Icon(Icons.open_in_browser_rounded, size: 18),
               label: const Text('Open Online Policy'),
               onPressed: () {
-                final uri = Uri.parse(AdConfig.privacyPolicyUrl!);
+                final uri = Uri.parse(AdConfig.privacyPolicyUrl);
                 launchUrl(uri, mode: LaunchMode.externalApplication);
               },
             ),

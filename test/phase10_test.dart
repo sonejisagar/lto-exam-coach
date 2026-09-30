@@ -18,7 +18,6 @@ void main() {
       expect(pending, isNotEmpty);
       expect(pending.any((item) => item.contains('Banner')), isTrue);
       expect(pending.any((item) => item.contains('Interstitial')), isTrue);
-      expect(pending.any((item) => item.contains('Privacy Policy')), isTrue);
     });
 
     test('4. AdConfig preserves official Google test ad unit IDs', () {
@@ -28,8 +27,8 @@ void main() {
       expect(AdConfig.testIosInterstitialId, equals('ca-app-pub-3940256099942544/4411468910'));
     });
 
-    test('5. AdConfig privacyPolicyUrl is null without fake or dead URLs', () {
-      expect(AdConfig.privacyPolicyUrl, isNull);
+    test('5. AdConfig privacyPolicyUrl is a verified production HTTPS URL', () {
+      expect(AdConfig.privacyPolicyUrl, equals('https://sonejisagar.github.io/lto-exam-coach/'));
     });
 
     test('6. QuestionRepository loads all 150 practice questions offline with 0 validation errors', () {

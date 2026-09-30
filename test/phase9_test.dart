@@ -98,12 +98,8 @@ void main() {
 
     test('4. Privacy policy URL placeholder configuration', () {
       // Must not contain fake or broken github URLs
-      if (AdConfig.privacyPolicyUrl != null) {
-        expect(AdConfig.privacyPolicyUrl!.startsWith('http'), isTrue);
-        expect(AdConfig.privacyPolicyUrl!.contains('fake'), isFalse);
-      } else {
-        expect(AdConfig.privacyPolicyUrl, isNull);
-      }
+      expect(AdConfig.privacyPolicyUrl.startsWith('http'), isTrue);
+      expect(AdConfig.privacyPolicyUrl.contains('fake'), isFalse);
     });
 
     test('5. Session frequency and cooldown constants', () {
