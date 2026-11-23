@@ -53,13 +53,6 @@ jobs:
           java-version: '21'
           cache: 'gradle'
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.44.2'
-          channel: 'stable'
-          cache: true
-
       - name: Restore Keystore from Secrets
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
@@ -87,11 +80,27 @@ jobs:
               f.write(f"storePassword={sp}\nkeyPassword={kp}\nkeyAlias={ka}\nstoreFile=upload-keystore.jks\n")
           '
 
+      - name: Restore & Verify google-services.json
+        env:
+          GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+        run: |
+          python3 -c '
+          import base64, json, os
+          data = "".join(os.environ["GOOGLE_SERVICES_JSON_BASE64"].lstrip("\ufeff").split())
+          raw = base64.b64decode(data)
+          json.loads(raw)
+          open("android/app/google-services.json", "wb").write(raw)
+          print("google-services.json bytes:", len(raw), "(valid JSON)")
+          '
+
       - name: Verify Keystore & Signing Config
         run: |
           python3 -c '
-          import os, subprocess
-          print("Keystore bytes:", os.path.getsize("android/app/upload-keystore.jks"))
+          import os
+          sz = os.path.getsize("android/app/upload-keystore.jks")
+          print("Keystore bytes:", sz)
+          if sz < 2000:
+              print("::error::KEYSTORE_BASE64 appears truncated! Expected ~2776 bytes, got", sz)
           props = dict(line.strip().split("=", 1) for line in open("android/key.properties") if "=" in line)
           for k in ("storePassword", "keyPassword", "keyAlias", "storeFile"):
               print(f"{k} length:", len(props.get(k, "")))
@@ -118,11 +127,12 @@ jobs:
           EOF
           java /tmp/CheckKS.java
 
-      - name: Restore google-services.json
-        env:
-          GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
-        run: |
-          python3 -c 'import base64, os; data = "".join(os.environ["GOOGLE_SERVICES_JSON_BASE64"].lstrip("\ufeff").split()); open("android/app/google-services.json", "wb").write(base64.b64decode(data))'
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.2'
+          channel: 'stable'
+          cache: true
 
       - name: Install Dependencies
         run: flutter pub get
