@@ -105,3 +105,4 @@ jobs:
           releaseFiles: build/app/outputs/bundle/release/app-release.aab
           track: ${{ github.event.inputs.track || 'production' }}
           status: 'completed'
+          whatsNewDirectory: distribution/whatsnew
