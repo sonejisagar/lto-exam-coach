@@ -73,8 +73,50 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
         run: |
-          printf 'storePassword=%s\nkeyPassword=%s\nkeyAlias=%s\nstoreFile=upload-keystore.jks\n' \
-            "$STORE_PASSWORD" "$KEY_PASSWORD" "$KEY_ALIAS" > android/key.properties
+          python3 -c '
+          import os
+          def clean(name, prefix):
+              v = os.environ[name].strip()
+              if v.startswith(prefix):
+                  v = v[len(prefix):].strip()
+              return v
+          sp = clean("STORE_PASSWORD", "storePassword=")
+          kp = clean("KEY_PASSWORD", "keyPassword=")
+          ka = clean("KEY_ALIAS", "keyAlias=")
+          with open("android/key.properties", "w", encoding="utf-8") as f:
+              f.write(f"storePassword={sp}\nkeyPassword={kp}\nkeyAlias={ka}\nstoreFile=upload-keystore.jks\n")
+          '
+
+      - name: Verify Keystore & Signing Config
+        run: |
+          python3 -c '
+          import os, subprocess
+          print("Keystore bytes:", os.path.getsize("android/app/upload-keystore.jks"))
+          props = dict(line.strip().split("=", 1) for line in open("android/key.properties") if "=" in line)
+          for k in ("storePassword", "keyPassword", "keyAlias", "storeFile"):
+              print(f"{k} length:", len(props.get(k, "")))
+          '
+          cat << 'EOF' > /tmp/CheckKS.java
+          import java.io.*;
+          import java.security.*;
+          import java.util.*;
+          public class CheckKS {
+            public static void main(String[] args) throws Exception {
+              Properties p = new Properties();
+              try (var in = new FileInputStream("android/key.properties")) { p.load(in); }
+              File f = new File("android/app/" + p.getProperty("storeFile"));
+              KeyStore ks = KeyStore.getInstance(f, p.getProperty("storePassword").toCharArray());
+              String alias = p.getProperty("keyAlias");
+              Key k = ks.getKey(alias, p.getProperty("keyPassword").toCharArray());
+              if (k == null) {
+                System.err.println("::error::Key alias not found in keystore! Available aliases: " + Collections.list(ks.aliases()));
+                System.exit(1);
+              }
+              System.out.println("Java KeyStore signing check PASSED.");
+            }
+          }
+          EOF
+          java /tmp/CheckKS.java
 
       - name: Restore google-services.json
         env:
