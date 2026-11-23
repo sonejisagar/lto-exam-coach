@@ -9,12 +9,14 @@ class PrepareSmarterIllustration extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return CustomPaint(
-      size: const Size(260, 200),
-      painter: _PrepareSmarterPainter(
-        primaryColor: colorScheme.primary,
-        secondaryColor: colorScheme.secondary,
-        containerColor: colorScheme.primaryContainer,
+    return RepaintBoundary(
+      child: CustomPaint(
+        size: const Size(260, 200),
+        painter: _PrepareSmarterPainter(
+          primaryColor: colorScheme.primary,
+          secondaryColor: colorScheme.secondary,
+          containerColor: colorScheme.primaryContainer,
+        ),
       ),
     );
   }
@@ -124,12 +126,14 @@ class MasterRoadSignsIllustration extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return CustomPaint(
-      size: const Size(260, 200),
-      painter: _MasterRoadSignsPainter(
-        primaryColor: colorScheme.primary,
-        secondaryColor: colorScheme.secondary,
-        containerColor: colorScheme.secondaryContainer,
+    return RepaintBoundary(
+      child: CustomPaint(
+        size: const Size(260, 200),
+        painter: _MasterRoadSignsPainter(
+          primaryColor: colorScheme.primary,
+          secondaryColor: colorScheme.secondary,
+          containerColor: colorScheme.secondaryContainer,
+        ),
       ),
     );
   }
@@ -228,13 +232,15 @@ class TrackProgressIllustration extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    return CustomPaint(
-      size: const Size(260, 200),
-      painter: _TrackProgressPainter(
-        primaryColor: colorScheme.primary,
-        secondaryColor: colorScheme.secondary,
-        tertiaryColor: colorScheme.tertiary,
-        containerColor: colorScheme.tertiaryContainer,
+    return RepaintBoundary(
+      child: CustomPaint(
+        size: const Size(260, 200),
+        painter: _TrackProgressPainter(
+          primaryColor: colorScheme.primary,
+          secondaryColor: colorScheme.secondary,
+          tertiaryColor: colorScheme.tertiary,
+          containerColor: colorScheme.tertiaryContainer,
+        ),
       ),
     );
   }

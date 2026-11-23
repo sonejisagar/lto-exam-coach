@@ -292,8 +292,11 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Mock Exam'), findsWidgets);
-      expect(find.text('Test your knowledge with a timed practice exam.'), findsOneWidget);
-      expect(find.text('Practice only'), findsOneWidget);
+      expect(
+        find.text('Test your knowledge under official examination rules and time limits.'),
+        findsOneWidget,
+      );
+      expect(find.text('Practice Reviewer Notice'), findsOneWidget);
       expect(
         find.text(
           'This mock exam is an independent study tool. It is not an official LTO examination.',

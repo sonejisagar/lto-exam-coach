@@ -23,9 +23,11 @@ class RoadSignWidget extends StatelessWidget {
       child: SizedBox(
         width: size,
         height: size,
-        child: CustomPaint(
-          size: Size(size, size),
-          painter: RoadSignPainter(signType: signType),
+        child: RepaintBoundary(
+          child: CustomPaint(
+            size: Size(size, size),
+            painter: RoadSignPainter(signType: signType),
+          ),
         ),
       ),
     );

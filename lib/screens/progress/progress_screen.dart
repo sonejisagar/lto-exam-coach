@@ -53,7 +53,7 @@ class ProgressScreen extends StatelessWidget {
       body: isEmpty
           ? _buildEmptyState(context)
           : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -73,6 +73,11 @@ class ProgressScreen extends StatelessWidget {
                   // Overall Practice Stats
                   _buildOverallPracticeSection(context, progress),
                   const SizedBox(height: 16),
+
+                  // Passive Banner Ad (inline between stats and coverage)
+                  const AdBannerWidget(
+                    margin: EdgeInsets.only(bottom: 16),
+                  ),
 
                   // Practice Coverage
                   _buildPracticeCoverageSection(context, progress),
@@ -110,10 +115,6 @@ class ProgressScreen extends StatelessWidget {
                   // Educational Disclaimer
                   const DisclaimerBanner(compact: true),
                   const SizedBox(height: 16),
-
-                  // Passive Banner Ad
-                  const AdBannerWidget(),
-                  const SizedBox(height: 8),
                 ],
               ),
             ),

@@ -36,8 +36,8 @@ class _AdBannerWidgetState extends State<AdBannerWidget> {
   }
 
   void _loadBanner() {
-    // In widget tests or non-mobile platforms, collapse cleanly without platform calls
-    if (kIsWeb || AdService.instance.isTestEnvironment) {
+    // In widget tests, non-mobile platforms, or when ads are disabled remotely, collapse cleanly
+    if (kIsWeb || AdService.instance.isTestEnvironment || !AdConfig.areAdsEnabled) {
       return;
     }
 

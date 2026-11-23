@@ -5,9 +5,12 @@ import '../utils/constants.dart';
 
 class QuestionRepository {
   final List<QuestionModel> _questions;
+  late final Map<String, QuestionModel> _questionMap;
 
   QuestionRepository({List<QuestionModel>? questions})
-      : _questions = questions ?? QuestionsData.allQuestions;
+      : _questions = questions ?? QuestionsData.allQuestions {
+    _questionMap = {for (final q in _questions) q.id: q};
+  }
 
   /// Returns all available questions.
   List<QuestionModel> getAllQuestions() => List.unmodifiable(_questions);
@@ -38,20 +41,14 @@ class QuestionRepository {
     return _questions.where((q) => q.appliesToVehicle(vehicleType)).toList();
   }
 
-  /// Returns a specific question by its unique ID, or null if not found.
-  QuestionModel? getQuestionById(String id) {
-    try {
-      return _questions.firstWhere((q) => q.id == id);
-    } catch (_) {
-      return null;
-    }
-  }
+  /// Returns a specific question by its unique ID in O(1) time, or null if not found.
+  QuestionModel? getQuestionById(String id) => _questionMap[id];
 
-  /// Returns a list of questions corresponding to the given IDs, ignoring invalid or missing IDs.
+  /// Returns a list of questions corresponding to the given IDs in O(M) time, ignoring invalid or missing IDs.
   List<QuestionModel> getQuestionsByIds(Iterable<String> ids) {
     final List<QuestionModel> result = [];
     for (final id in ids) {
-      final q = getQuestionById(id);
+      final q = _questionMap[id];
       if (q != null) {
         result.add(q);
       }

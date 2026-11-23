@@ -168,9 +168,9 @@ void main() {
       await tester.pumpAndSettle();
 
       // Initially 150 questions left
-      expect(find.text('150 Questions Left to Review'), findsOneWidget);
+      expect(find.text('150 Questions left to complete reviewer'), findsOneWidget);
       expect(find.text("Today's Summary"), findsOneWidget);
-      expect(find.text('Today'), findsOneWidget);
+      expect(find.textContaining('Practiced'), findsOneWidget);
 
       // Record a practice attempt today
       await progressProvider.recordPracticeAttempt(
@@ -183,7 +183,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Subtitle dynamically updates to 149 questions left
-      expect(find.text('149 Questions Left to Review'), findsOneWidget);
+      expect(find.text('149 Questions left to complete reviewer'), findsOneWidget);
       expect(find.text('1'), findsWidgets); // 1 today
     });
 

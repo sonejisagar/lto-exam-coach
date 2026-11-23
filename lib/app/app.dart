@@ -6,8 +6,23 @@ import '../utils/constants.dart';
 import 'routes/app_routes.dart';
 import 'theme/app_theme.dart';
 
-class LtoExamCoachApp extends StatelessWidget {
+import '../services/ad_service.dart';
+
+class LtoExamCoachApp extends StatefulWidget {
   const LtoExamCoachApp({super.key});
+
+  @override
+  State<LtoExamCoachApp> createState() => _LtoExamCoachAppState();
+}
+
+class _LtoExamCoachAppState extends State<LtoExamCoachApp> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AdService.instance.showColdStartAppOpenAd();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

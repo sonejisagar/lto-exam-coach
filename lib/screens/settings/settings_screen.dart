@@ -17,7 +17,7 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
     final settingsProvider = context.watch<SettingsProvider>();
 
@@ -26,97 +26,88 @@ class SettingsScreen extends StatelessWidget {
         title: Text(l10n?.settingsTitle ?? 'Settings'),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.base),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.base,
+          AppSpacing.sm,
+          AppSpacing.base,
+          AppSpacing.xxl,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // GENERAL SECTION
-            _buildSectionHeader(context, l10n?.sectionGeneral ?? 'GENERAL'),
+            _buildSectionHeader(
+              context,
+              title: l10n?.sectionGeneral ?? 'GENERAL',
+              color: AppColors.primary,
+            ),
             const SizedBox(height: AppSpacing.sm),
             CustomCard(
+              padding: EdgeInsets.zero,
               child: Column(
                 children: [
-                  ListTile(
-                    leading: const Icon(Icons.language_rounded),
-                    title: Text(l10n?.settingLanguage ?? 'Language'),
-                    subtitle: const Text('Reviewer language / Wika'),
+                  _SettingsTile(
+                    icon: Icons.language_rounded,
+                    iconColor: AppColors.primary,
+                    title: l10n?.settingLanguage ?? 'Language',
+                    subtitle: 'Reviewer language / Wika',
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          settingsProvider.languageLabel,
-                          style: TextStyle(
-                            color: colorScheme.primary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: isDark ? 0.20 : 0.10),
+                            borderRadius: BorderRadius.circular(AppRadius.chip),
+                          ),
+                          child: Text(
+                            settingsProvider.languageLabel,
+                            style: TextStyle(
+                              color: isDark ? AppColors.primaryLight : AppColors.primary,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 12.5,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 4),
-                        const Icon(Icons.chevron_right_rounded),
+                        Icon(
+                          Icons.chevron_right_rounded,
+                          size: 20,
+                          color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                        ),
                       ],
                     ),
                     onTap: () => _showLanguageSelectionDialog(context),
                   ),
-                  const Divider(height: 1),
-                  SwitchListTile(
-                    title: Text(l10n?.settingDarkTheme ?? 'Dark Theme'),
-                    subtitle: Text(l10n?.settingDarkThemeDesc ?? 'Toggle app dark mode appearance'),
-                    secondary: const Icon(Icons.dark_mode_rounded),
-                    value: settingsProvider.themeMode == ThemeMode.dark,
-                    onChanged: (val) {
-                      context.read<SettingsProvider>().setThemeMode(
-                            val ? ThemeMode.dark : ThemeMode.light,
-                          );
-                    },
-                  ),
-                  const Divider(height: 1),
-                  SwitchListTile(
-                    title: Text(l10n?.settingDailyReminder ?? 'Daily Study Reminder'),
-                    subtitle: const Text('Get notified to practice daily at 7:00 PM'),
-                    secondary: const Icon(Icons.notifications_active_rounded),
-                    value: settingsProvider.dailyReminder,
-                    onChanged: (val) {
-                      context.read<SettingsProvider>().setDailyReminder(val);
-                    },
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xl),
-
-            // STUDY SECTION
-            _buildSectionHeader(context, l10n?.sectionStudy ?? 'STUDY'),
-            const SizedBox(height: AppSpacing.sm),
-            CustomCard(
-              child: Column(
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.directions_car_rounded),
-                    title: Text(l10n?.settingVehicleCategory ?? 'Vehicle Category'),
-                    subtitle: Text(settingsProvider.vehicleTypeLabel),
-                    trailing: const Icon(Icons.chevron_right_rounded),
-                    onTap: () => _showVehicleSelectionDialog(context),
-                  ),
-                  const Divider(height: 1),
-                  ListTile(
-                    leading: const Icon(Icons.track_changes_rounded),
-                    title: Text(l10n?.settingDailyGoal ?? 'Daily Practice Goal'),
-                    subtitle: Text(
-                      l10n?.settingDailyGoalDesc(settingsProvider.dailyGoal) ??
-                          '${settingsProvider.dailyGoal} Questions per day',
-                    ),
-                    trailing: DropdownButton<int>(
-                      value: settingsProvider.dailyGoal,
-                      underline: const SizedBox(),
-                      items: const [
-                        DropdownMenuItem(value: 10, child: Text('10 Qs')),
-                        DropdownMenuItem(value: 20, child: Text('20 Qs')),
-                        DropdownMenuItem(value: 30, child: Text('30 Qs')),
-                      ],
+                  _buildDivider(isDark),
+                  _SettingsTile(
+                    icon: Icons.dark_mode_rounded,
+                    iconColor: AppColors.tertiary,
+                    title: l10n?.settingDarkTheme ?? 'Dark Theme',
+                    subtitle: l10n?.settingDarkThemeDesc ?? 'Toggle dark mode appearance',
+                    trailing: Switch(
+                      value: settingsProvider.themeMode == ThemeMode.dark,
+                      activeThumbColor: Colors.white,
+                      activeTrackColor: AppColors.primary,
                       onChanged: (val) {
-                        if (val != null) {
-                          context.read<SettingsProvider>().setDailyGoal(val);
-                        }
+                        context.read<SettingsProvider>().setThemeMode(
+                              val ? ThemeMode.dark : ThemeMode.light,
+                            );
+                      },
+                    ),
+                  ),
+                  _buildDivider(isDark),
+                  _SettingsTile(
+                    icon: Icons.notifications_active_rounded,
+                    iconColor: AppColors.warning,
+                    title: l10n?.settingDailyReminder ?? 'Daily Study Reminder',
+                    subtitle: 'Get notified to practice daily at 7:00 PM',
+                    trailing: Switch(
+                      value: settingsProvider.dailyReminder,
+                      activeThumbColor: Colors.white,
+                      activeTrackColor: AppColors.primary,
+                      onChanged: (val) {
+                        context.read<SettingsProvider>().setDailyReminder(val);
                       },
                     ),
                   ),
@@ -125,50 +116,164 @@ class SettingsScreen extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.xl),
 
-            // ABOUT SECTION
-            _buildSectionHeader(context, l10n?.sectionAbout ?? 'ABOUT'),
+            // STUDY SECTION
+            _buildSectionHeader(
+              context,
+              title: l10n?.sectionStudy ?? 'STUDY PREFERENCES',
+              color: AppColors.secondary,
+            ),
             const SizedBox(height: AppSpacing.sm),
             CustomCard(
+              padding: EdgeInsets.zero,
               child: Column(
                 children: [
-                  ListTile(
-                    leading: const Icon(Icons.verified_rounded),
-                    title: Text(l10n?.settingAppVersion ?? 'App Version'),
-                    subtitle: const Text('1.0.0 (Build 1)'),
+                  _SettingsTile(
+                    icon: Icons.directions_car_rounded,
+                    iconColor: AppColors.secondary,
+                    title: l10n?.settingVehicleCategory ?? 'Vehicle Category',
+                    subtitle: settingsProvider.vehicleTypeLabel,
+                    trailing: Icon(
+                      Icons.chevron_right_rounded,
+                      size: 20,
+                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                    ),
+                    onTap: () => _showVehicleSelectionDialog(context),
                   ),
-                  const Divider(height: 1),
-                  ListTile(
-                    leading: const Icon(Icons.info_outline_rounded),
-                    title: const Text('About & Legal Disclaimer'),
-                    trailing: const Icon(Icons.chevron_right_rounded),
+                  _buildDivider(isDark),
+                  _SettingsTile(
+                    icon: Icons.track_changes_rounded,
+                    iconColor: AppColors.success,
+                    title: l10n?.settingDailyGoal ?? 'Daily Practice Goal',
+                    subtitle: l10n?.settingDailyGoalDesc(settingsProvider.dailyGoal) ??
+                        '${settingsProvider.dailyGoal} Questions per day',
+                    trailing: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? AppColors.darkElevatedSurface
+                            : AppColors.lightElevatedSurface,
+                        borderRadius: BorderRadius.circular(AppRadius.chip),
+                        border: Border.all(
+                          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+                          width: 1,
+                        ),
+                      ),
+                      child: DropdownButton<int>(
+                        value: settingsProvider.dailyGoal,
+                        underline: const SizedBox(),
+                        icon: const Icon(Icons.arrow_drop_down_rounded, size: 20),
+                        items: const [
+                          DropdownMenuItem(
+                            value: 10,
+                            child: Text('10 Qs', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                          ),
+                          DropdownMenuItem(
+                            value: 20,
+                            child: Text('20 Qs', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                          ),
+                          DropdownMenuItem(
+                            value: 30,
+                            child: Text('30 Qs', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                          ),
+                        ],
+                        onChanged: (val) {
+                          if (val != null) {
+                            context.read<SettingsProvider>().setDailyGoal(val);
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.xl),
+
+            // ABOUT SECTION
+            _buildSectionHeader(
+              context,
+              title: l10n?.sectionAbout ?? 'ABOUT & PRIVACY',
+              color: AppColors.tertiary,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            CustomCard(
+              padding: EdgeInsets.zero,
+              child: Column(
+                children: [
+                  _SettingsTile(
+                    icon: Icons.verified_rounded,
+                    iconColor: const Color(0xFF8B5CF6),
+                    title: l10n?.settingAppVersion ?? 'App Version',
+                    subtitle: '1.0.0 (Build 9)',
+                    trailing: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF8B5CF6).withValues(alpha: isDark ? 0.20 : 0.12),
+                        borderRadius: BorderRadius.circular(AppRadius.chip),
+                      ),
+                      child: const Text(
+                        'Up to Date',
+                        style: TextStyle(
+                          color: Color(0xFF8B5CF6),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                  ),
+                  _buildDivider(isDark),
+                  _SettingsTile(
+                    icon: Icons.info_outline_rounded,
+                    iconColor: AppColors.primary,
+                    title: 'About & Legal Disclaimer',
+                    subtitle: 'App info, educational purpose & disclaimer',
+                    trailing: Icon(
+                      Icons.chevron_right_rounded,
+                      size: 20,
+                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                    ),
                     onTap: () {
                       Navigator.pushNamed(context, AppRoutes.about);
                     },
                   ),
-                  const Divider(height: 1),
-                  ListTile(
-                    leading: const Icon(Icons.privacy_tip_outlined),
-                    title: const Text('Privacy Policy'),
-                    subtitle: const Text('Information on offline data and privacy'),
-                    trailing: const Icon(Icons.chevron_right_rounded),
+                  _buildDivider(isDark),
+                  _SettingsTile(
+                    icon: Icons.privacy_tip_outlined,
+                    iconColor: const Color(0xFF06B6D4),
+                    title: 'Privacy Policy',
+                    subtitle: 'Information on offline data and privacy',
+                    trailing: Icon(
+                      Icons.chevron_right_rounded,
+                      size: 20,
+                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                    ),
                     onTap: () => _showPrivacyPolicyDialog(context),
                   ),
-                  const Divider(height: 1),
-                  ListTile(
-                    leading: const Icon(Icons.ad_units_outlined),
-                    title: const Text('Ad Privacy & Consent'),
-                    subtitle: const Text('Manage your advertising & consent preferences'),
-                    trailing: const Icon(Icons.chevron_right_rounded),
+                  _buildDivider(isDark),
+                  _SettingsTile(
+                    icon: Icons.ad_units_outlined,
+                    iconColor: AppColors.warning,
+                    title: 'Ad Privacy & Consent',
+                    subtitle: 'Manage your advertising & consent preferences',
+                    trailing: Icon(
+                      Icons.chevron_right_rounded,
+                      size: 20,
+                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                    ),
                     onTap: () => _handleAdConsentOptions(context),
                   ),
-                  const Divider(height: 1),
-                  ListTile(
-                    leading: const Icon(Icons.restart_alt_rounded, color: AppColors.error),
-                    title: const Text(
-                      'Reset Study Data',
-                      style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w600),
+                  _buildDivider(isDark),
+                  _SettingsTile(
+                    icon: Icons.restart_alt_rounded,
+                    iconColor: AppColors.error,
+                    title: 'Reset Study Data',
+                    titleColor: AppColors.error,
+                    subtitle: 'Clear practice history, mistakes, bookmarks & streak',
+                    trailing: Icon(
+                      Icons.chevron_right_rounded,
+                      size: 20,
+                      color: AppColors.error.withValues(alpha: 0.6),
                     ),
-                    subtitle: const Text('Clear practice history, wrong answers, bookmarks, mock tests, and streak'),
                     onTap: () {
                       _showResetConfirmationDialog(context);
                     },
@@ -184,20 +289,43 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, String title) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+  Widget _buildDivider(bool isDark) {
+    return Divider(
+      height: 1,
+      thickness: 1,
+      indent: 56,
+      color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+    );
+  }
 
-    return Padding(
-      padding: const EdgeInsets.only(left: 4),
-      child: Text(
-        title,
-        style: theme.textTheme.labelLarge?.copyWith(
-          color: colorScheme.primary,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 0.8,
+  Widget _buildSectionHeader(
+    BuildContext context, {
+    required String title,
+    required Color color,
+  }) {
+    final theme = Theme.of(context);
+
+    return Row(
+      children: [
+        Container(
+          width: 3.5,
+          height: 14,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(2),
+          ),
         ),
-      ),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: theme.textTheme.labelMedium?.copyWith(
+            color: color,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.8,
+            fontSize: 11.5,
+          ),
+        ),
+      ],
     );
   }
 
@@ -409,3 +537,80 @@ class SettingsScreen extends StatelessWidget {
   }
 }
 
+class _SettingsTile extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String subtitle;
+  final Color? titleColor;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+
+  const _SettingsTile({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.subtitle,
+    this.titleColor,
+    this.trailing,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: iconColor.withValues(alpha: isDark ? 0.20 : 0.12),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: iconColor.withValues(alpha: 0.25),
+                  width: 0.8,
+                ),
+              ),
+              child: Icon(icon, color: iconColor, size: 19),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14.5,
+                      color: titleColor ?? (isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary),
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                      fontSize: 11.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (trailing != null) ...[
+              const SizedBox(width: 8),
+              trailing!,
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}

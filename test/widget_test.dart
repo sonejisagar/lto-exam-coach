@@ -31,7 +31,7 @@ void main() {
     expect(find.text('LTO Exam Coach'), findsOneWidget);
     expect(find.text('Home'), findsOneWidget);
     expect(find.text('Practice'), findsOneWidget);
-    expect(find.text('Mock Test'), findsWidgets);
+    expect(find.text('Mock Exam'), findsWidgets);
     expect(find.text('Progress'), findsOneWidget);
   });
 }

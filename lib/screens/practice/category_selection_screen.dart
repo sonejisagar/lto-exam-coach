@@ -122,7 +122,12 @@ class CategorySelectionScreen extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.base),
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.base,
+          AppSpacing.sm,
+          AppSpacing.base,
+          100,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -461,7 +466,13 @@ class CategorySelectionScreen extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.md),
+
+            // High-Visibility Inline Banner Ad (Placed mid-design above topics)
+            const AdBannerWidget(
+              margin: EdgeInsets.symmetric(vertical: 4),
+            ),
+            const SizedBox(height: AppSpacing.md),
 
             Text(
               'Select a Topic',
@@ -541,10 +552,6 @@ class CategorySelectionScreen extends StatelessWidget {
                 );
               },
             ),
-            const SizedBox(height: AppSpacing.base),
-
-            // Passive Banner Ad
-            const AdBannerWidget(),
             const SizedBox(height: AppSpacing.sm),
           ],
         ),

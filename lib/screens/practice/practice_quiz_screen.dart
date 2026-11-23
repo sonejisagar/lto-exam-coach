@@ -4,6 +4,7 @@ import '../../data/questions_filipino.dart';
 import '../../providers/quiz_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../services/ad_service.dart';
+import '../../services/app_update_review_service.dart';
 import '../../utils/constants.dart';
 import '../../widgets/ad_banner.dart';
 import '../../widgets/custom_card.dart';
@@ -385,8 +386,22 @@ class PracticeQuizScreen extends StatelessWidget {
   }
 }
 
-class _PracticeCompletionView extends StatelessWidget {
+class _PracticeCompletionView extends StatefulWidget {
   const _PracticeCompletionView();
+
+  @override
+  State<_PracticeCompletionView> createState() =>
+      _PracticeCompletionViewState();
+}
+
+class _PracticeCompletionViewState extends State<_PracticeCompletionView> {
+  @override
+  void initState() {
+    super.initState();
+    // Mark activity completed so the Play Store review prompt can fire
+    // on the next app open (if conditions are met).
+    AppUpdateReviewService.instance.markActivityCompleted();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -418,6 +433,7 @@ class _PracticeCompletionView extends StatelessWidget {
                   child: Icon(
                     Icons.emoji_events_rounded,
                     size: 64,
+
                     color: colorScheme.primary,
                   ),
                 ),
@@ -489,7 +505,13 @@ class _PracticeCompletionView extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
+
+                // High-Visibility Inline Banner Ad (Placed mid-design between Score and Disclaimer)
+                const AdBannerWidget(
+                  margin: EdgeInsets.symmetric(vertical: 4),
+                ),
+                const SizedBox(height: 16),
 
                 // Disclaimer
                 Container(
@@ -509,10 +531,6 @@ class _PracticeCompletionView extends StatelessWidget {
                 ),
 
                 const SizedBox(height: 20),
-
-                // Passive Banner Ad
-                const AdBannerWidget(),
-                const SizedBox(height: 16),
 
                 // Action Buttons
                 Row(

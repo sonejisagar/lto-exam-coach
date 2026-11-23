@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Phase 11 Dark Study Theme Palette
-  static const Color darkBackground = Color(0xFF0B1115);
-  static const Color darkSurface = Color(0xFF151D22);
-  static const Color darkElevatedSurface = Color(0xFF1B252B);
-  static const Color darkBorder = Color(0xFF26333A);
-  static const Color darkTextPrimary = Color(0xFFF4F7F8);
-  static const Color darkTextSecondary = Color(0xFFAAB7BE);
+  // Phase 12 Elevated Dark Automotive / Oceanic Study Palette
+  static const Color darkBackground = Color(0xFF090E15);
+  static const Color darkSurface = Color(0xFF111923);
+  static const Color darkElevatedSurface = Color(0xFF182330);
+  static const Color darkBorder = Color(0xFF223242);
+  static const Color darkTextPrimary = Color(0xFFF8FAFC);
+  static const Color darkTextSecondary = Color(0xFF94A3B8);
 
-  // Phase 11 Light Study Theme Palette
+  // Phase 12 Clean Porcelain Light Study Palette
   static const Color lightBackground = Color(0xFFF8FAFC);
   static const Color lightSurface = Color(0xFFFFFFFF);
   static const Color lightElevatedSurface = Color(0xFFF1F5F9);
@@ -17,37 +17,41 @@ class AppColors {
   static const Color lightTextPrimary = Color(0xFF0F172A);
   static const Color lightTextSecondary = Color(0xFF64748B);
 
-  // Primary Sky / Teal Brand Palette
-  static const Color primary = Color(0xFF0797C8);
-  static const Color primaryLight = Color(0xFF29B6E6);
+  // Vibrant Electric Sky Brand Palette (Modern LTO Driving Tech)
+  static const Color primary = Color(0xFF0284C7);
+  static const Color primaryLight = Color(0xFF38BDF8);
+  static const Color primaryDark = Color(0xFF0369A1);
   static const Color onPrimary = Color(0xFFFFFFFF);
-  static const Color primaryContainer = Color(0xFF173847);
-  static const Color onPrimaryContainer = Color(0xFFBCE7FD);
+  static const Color primaryContainer = Color(0xFF0C2B3E);
+  static const Color onPrimaryContainer = Color(0xFFBAE6FD);
 
-  static const Color secondary = Color(0xFF26A69A);
+  // Teal / Cyan Secondary Accent
+  static const Color secondary = Color(0xFF0D9488);
+  static const Color secondaryLight = Color(0xFF2DD4BF);
   static const Color onSecondary = Color(0xFFFFFFFF);
-  static const Color secondaryContainer = Color(0xFF163C38);
-  static const Color onSecondaryContainer = Color(0xFFB2DFDB);
+  static const Color secondaryContainer = Color(0xFF103633);
+  static const Color onSecondaryContainer = Color(0xFF99F6E4);
 
-  static const Color tertiary = Color(0xFF5C6BC0);
+  // Indigo / Royal Tertiary Accent
+  static const Color tertiary = Color(0xFF6366F1);
   static const Color onTertiary = Color(0xFFFFFFFF);
-  static const Color tertiaryContainer = Color(0xFF222B4C);
-  static const Color onTertiaryContainer = Color(0xFFC5CAE9);
+  static const Color tertiaryContainer = Color(0xFF1E1B4B);
+  static const Color onTertiaryContainer = Color(0xFFC7D2FE);
 
-  // Functional Colors
-  static const Color error = Color(0xFFE53935);
+  // High-Vibrancy Functional Accents
+  static const Color error = Color(0xFFEF4444);
   static const Color onError = Color(0xFFFFFFFF);
-  static const Color errorContainer = Color(0xFF3F191B);
-  static const Color onErrorContainer = Color(0xFFFFCDD2);
+  static const Color errorContainer = Color(0xFF451419);
+  static const Color onErrorContainer = Color(0xFFFECDD3);
 
-  static const Color success = Color(0xFF2BB673);
+  static const Color success = Color(0xFF10B981);
   static const Color onSuccess = Color(0xFFFFFFFF);
-  static const Color successContainer = Color(0xFF163826);
-  static const Color onSuccessContainer = Color(0xFFC8E6C9);
+  static const Color successContainer = Color(0xFF0D3728);
+  static const Color onSuccessContainer = Color(0xFFA7F3D0);
 
   static const Color warning = Color(0xFFF59E0B);
-  static const Color warningContainer = Color(0xFF3B2A10);
-  static const Color onWarningContainer = Color(0xFFFFE082);
+  static const Color warningContainer = Color(0xFF3F2606);
+  static const Color onWarningContainer = Color(0xFFFDE68A);
 
   // Surface & Neutral (Light)
   static const Color surfaceLight = Color(0xFFF8FAFC);
@@ -56,10 +60,113 @@ class AppColors {
   static const Color onSurfaceVariantLight = Color(0xFF64748B);
 
   // Surface & Neutral (Dark)
-  static const Color surfaceDark = Color(0xFF0B1115);
-  static const Color onSurfaceDark = Color(0xFFF4F7F8);
-  static const Color surfaceVariantDark = Color(0xFF151D22);
-  static const Color onSurfaceVariantDark = Color(0xFFAAB7BE);
+  static const Color surfaceDark = Color(0xFF090E15);
+  static const Color onSurfaceDark = Color(0xFFF8FAFC);
+  static const Color surfaceVariantDark = Color(0xFF111923);
+  static const Color onSurfaceVariantDark = Color(0xFF94A3B8);
+}
+
+class AppGradients {
+  static const LinearGradient primary = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF0284C7), Color(0xFF0EA5E9), Color(0xFF38BDF8)],
+  );
+
+  static const LinearGradient primaryAccent = LinearGradient(
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+    colors: [Color(0xFF0284C7), Color(0xFF06B6D4)],
+  );
+
+  static const LinearGradient amber = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFF59E0B), Color(0xFFFBBF24)],
+  );
+
+  static const LinearGradient emerald = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF10B981), Color(0xFF34D399)],
+  );
+
+  static const LinearGradient darkCard = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF131D28), Color(0xFF0E1620)],
+  );
+
+  static const LinearGradient darkCardGlow = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF182635), Color(0xFF101923)],
+  );
+
+  static const LinearGradient lightCard = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFFFFFFF), Color(0xFFF8FAFC)],
+  );
+
+  static const LinearGradient glassNavDark = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xF0131B24), Color(0xF50D131B)],
+  );
+
+  static const LinearGradient glassNavLight = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xF8FFFFFF), Color(0xF2F8FAFC)],
+  );
+}
+
+class AppShadows {
+  static List<BoxShadow> get cardLight => [
+        const BoxShadow(
+          color: Color(0x080F172A),
+          blurRadius: 4,
+          offset: Offset(0, 2),
+        ),
+      ];
+
+  static List<BoxShadow> get cardDark => [
+        const BoxShadow(
+          color: Color(0x28000000),
+          blurRadius: 4,
+          offset: Offset(0, 2),
+        ),
+      ];
+
+  static List<BoxShadow> get floatingNavLight => [
+        const BoxShadow(
+          color: Color(0x140284C7),
+          blurRadius: 12,
+          offset: Offset(0, 4),
+        ),
+        const BoxShadow(
+          color: Color(0x0A0F172A),
+          blurRadius: 4,
+          offset: Offset(0, 2),
+        ),
+      ];
+
+  static List<BoxShadow> get floatingNavDark => [
+        const BoxShadow(
+          color: Color(0x40000000),
+          blurRadius: 12,
+          offset: Offset(0, 4),
+        ),
+      ];
+
+  static List<BoxShadow> get primaryGlow => [
+        const BoxShadow(
+          color: Color(0x250284C7),
+          blurRadius: 8,
+          offset: Offset(0, 3),
+        ),
+      ];
 }
 
 class AppStrings {
@@ -124,12 +231,12 @@ class AppDifficulty {
 }
 
 class AppRadius {
-  static const double sm = 6.0;
-  static const double chip = 8.0;
-  static const double button = 10.0;
-  static const double card = 12.0;
-  static const double dialog = 16.0;
-  static const double pill = 16.0;
+  static const double sm = 8.0;
+  static const double chip = 10.0;
+  static const double button = 14.0;
+  static const double card = 16.0;
+  static const double dialog = 20.0;
+  static const double pill = 28.0;
 }
 
 class AppSpacing {

@@ -21,10 +21,18 @@ class AdService {
   bool _isLoadingInterstitial = false;
   DateTime? _lastInterstitialShownAt;
 
+  AppOpenAd? _appOpenAd;
+  bool _isLoadingAppOpenAd = false;
+  bool _hasAttemptedColdStartAppOpen = false;
+  bool _isShowingAppOpenAd = false;
+  bool _coldStartTimedOutOrClosed = false;
+
   bool get isInitialized => _isInitialized;
   bool get isTestEnvironment => _isTestEnvironment;
   bool get isInterstitialReady =>
       _isTestEnvironment ? _mockInterstitialReady : _interstitialAd != null;
+  bool get isAppOpenAdReady => _appOpenAd != null;
+  bool get hasAttemptedColdStartAppOpen => _hasAttemptedColdStartAppOpen;
 
   /// Visible for testing to configure stubbed test behavior.
   @visibleForTesting
@@ -36,6 +44,7 @@ class AdService {
     _mockInterstitialReady = mockInterstitialReady;
     _isInitialized = true;
     _lastInterstitialShownAt = null;
+    _hasAttemptedColdStartAppOpen = true;
   }
 
   /// Initializes the Google Mobile Ads SDK and requests UMP consent in the background.
@@ -52,6 +61,9 @@ class AdService {
     try {
       await MobileAds.instance.initialize();
       _isInitialized = true;
+
+      // Preload cold-start App Open ad immediately so it's ready as early as possible
+      preloadColdStartAppOpenAd();
 
       // Request UMP consent in the background
       _initConsentAndPreload();
@@ -114,7 +126,7 @@ class AdService {
 
   /// Preloads the next interstitial ad in the background.
   void preloadInterstitial() {
-    if (_isTestEnvironment || _isLoadingInterstitial || _interstitialAd != null) {
+    if (_isTestEnvironment || !AdConfig.areAdsEnabled || _isLoadingInterstitial || _interstitialAd != null) {
       return;
     }
 
@@ -146,7 +158,7 @@ class AdService {
   /// 1. An ad must already be loaded in memory.
   /// 2. Cooldown period must have elapsed since the last interstitial.
   bool canShowInterstitial() {
-    if (!isInterstitialReady) return false;
+    if (!AdConfig.areAdsEnabled || !isInterstitialReady) return false;
 
     if (_lastInterstitialShownAt != null) {
       final elapsed = DateTime.now().difference(_lastInterstitialShownAt!).inSeconds;
@@ -212,9 +224,150 @@ class AdService {
     }
   }
 
-  /// Disposes any loaded interstitial ad resources.
+  // ===========================================================================
+  // COLD-START APP OPEN AD LOGIC
+  // ===========================================================================
+
+  /// Preloads the App Open ad for initial app launch.
+  void preloadColdStartAppOpenAd() {
+    if (_isTestEnvironment ||
+        !AdConfig.areAdsEnabled ||
+        _hasAttemptedColdStartAppOpen ||
+        _isLoadingAppOpenAd ||
+        _appOpenAd != null) {
+      return;
+    }
+
+    _isLoadingAppOpenAd = true;
+    try {
+      AppOpenAd.load(
+        adUnitId: AdConfig.appOpenAdUnitId,
+        request: const AdRequest(),
+        adLoadCallback: AppOpenAdLoadCallback(
+          onAdLoaded: (ad) {
+            _isLoadingAppOpenAd = false;
+            if (_coldStartTimedOutOrClosed) {
+              debugPrint('[AdService] App Open ad loaded after timeout window; disposing.');
+              ad.dispose();
+              return;
+            }
+            _appOpenAd = ad;
+            debugPrint('[AdService] Cold-start App Open ad loaded successfully.');
+          },
+          onAdFailedToLoad: (error) {
+            _isLoadingAppOpenAd = false;
+            _appOpenAd = null;
+            debugPrint('[AdService] App Open ad failed to load: ${error.message} (code: ${error.code})');
+          },
+        ),
+      );
+    } catch (e) {
+      _isLoadingAppOpenAd = false;
+      debugPrint('[AdService] App Open load exception: $e');
+    }
+  }
+
+  /// Shows the cold-start App Open ad strictly on initial launch.
+  ///
+  /// CRITICAL RULES:
+  /// 1. ONLY runs once per app process launch (cold start).
+  /// 2. NEVER triggers on warm start / app switch / recent apps drawer resume.
+  /// 3. Times out safely after [timeoutMs] (default 2500ms) to ensure the user
+  ///    never experiences a frozen or delayed startup if offline or no fill.
+  Future<void> showColdStartAppOpenAd({
+    int timeoutMs = 2500,
+    VoidCallback? onComplete,
+  }) async {
+    // Permanent single-run guard: cold start only, never on resume
+    if (_hasAttemptedColdStartAppOpen || _isShowingAppOpenAd || !AdConfig.areAdsEnabled) {
+      _hasAttemptedColdStartAppOpen = true;
+      onComplete?.call();
+      return;
+    }
+    _hasAttemptedColdStartAppOpen = true;
+
+    if (_isTestEnvironment) {
+      onComplete?.call();
+      return;
+    }
+
+    // Ensure ad preloading was kicked off
+    if (_appOpenAd == null && !_isLoadingAppOpenAd) {
+      preloadColdStartAppOpenAd();
+    }
+
+    // If ad is ready right now, display it immediately
+    if (_appOpenAd != null) {
+      _displayAppOpenAd(_appOpenAd!, onComplete);
+      return;
+    }
+
+    // If still loading, wait up to timeoutMs (e.g. 2.5s)
+    final startTime = DateTime.now();
+    while (_isLoadingAppOpenAd && _appOpenAd == null) {
+      await Future.delayed(const Duration(milliseconds: 50));
+      if (DateTime.now().difference(startTime).inMilliseconds >= timeoutMs) {
+        _coldStartTimedOutOrClosed = true;
+        debugPrint(
+          '[AdService] Cold-start App Open ad timeout reached (${timeoutMs}ms). Proceeding smoothly.',
+        );
+        onComplete?.call();
+        return;
+      }
+    }
+
+    if (_appOpenAd != null && !_coldStartTimedOutOrClosed) {
+      _displayAppOpenAd(_appOpenAd!, onComplete);
+    } else {
+      _coldStartTimedOutOrClosed = true;
+      onComplete?.call();
+    }
+  }
+
+  void _displayAppOpenAd(AppOpenAd ad, VoidCallback? onComplete) {
+    _isShowingAppOpenAd = true;
+    _appOpenAd = null;
+
+    var hasCompleted = false;
+    void safeComplete() {
+      if (!hasCompleted) {
+        hasCompleted = true;
+        _isShowingAppOpenAd = false;
+        _coldStartTimedOutOrClosed = true;
+        onComplete?.call();
+      }
+    }
+
+    ad.fullScreenContentCallback = FullScreenContentCallback(
+      onAdShowedFullScreenContent: (ad) {
+        debugPrint('[AdService] App Open ad presented on screen.');
+      },
+      onAdDismissedFullScreenContent: (ad) {
+        debugPrint('[AdService] App Open ad dismissed by user.');
+        ad.dispose();
+        safeComplete();
+      },
+      onAdFailedToShowFullScreenContent: (ad, error) {
+        debugPrint('[AdService] App Open ad failed to show: ${error.message}');
+        ad.dispose();
+        safeComplete();
+      },
+    );
+
+    try {
+      ad.show();
+    } catch (e) {
+      debugPrint('[AdService] Exception displaying App Open ad: $e');
+      ad.dispose();
+      safeComplete();
+    }
+  }
+
+  /// Disposes any loaded interstitial and App Open ad resources.
   void dispose() {
     _interstitialAd?.dispose();
     _interstitialAd = null;
+    _appOpenAd?.dispose();
+    _appOpenAd = null;
   }
 }

@@ -6,8 +6,10 @@ class CustomCard extends StatelessWidget {
   final VoidCallback? onTap;
   final EdgeInsetsGeometry padding;
   final Color? backgroundColor;
+  final Gradient? gradient;
   final BorderSide? borderSide;
   final double borderRadius;
+  final List<BoxShadow>? boxShadow;
 
   const CustomCard({
     super.key,
@@ -15,34 +17,51 @@ class CustomCard extends StatelessWidget {
     this.onTap,
     this.padding = const EdgeInsets.all(AppSpacing.base),
     this.backgroundColor,
+    this.gradient,
     this.borderSide,
     this.borderRadius = AppRadius.card,
+    this.boxShadow,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final cardColor = backgroundColor ?? theme.cardTheme.color;
+    final isDark = theme.brightness == Brightness.dark;
+    final cardColor = backgroundColor ??
+        (gradient == null
+            ? (isDark ? AppColors.darkSurface : AppColors.lightSurface)
+            : null);
+
     final defaultBorder = borderSide ??
         BorderSide(
-          color: theme.colorScheme.outline,
+          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
           width: 1,
         );
 
-    return Card(
-      color: cardColor,
-      elevation: 0,
-      margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
+    final effectiveShadow = boxShadow ??
+        (isDark ? AppShadows.cardDark : AppShadows.cardLight);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: cardColor,
+        gradient: gradient,
         borderRadius: BorderRadius.circular(borderRadius),
-        side: defaultBorder,
+        border: Border.fromBorderSide(defaultBorder),
+        boxShadow: effectiveShadow,
       ),
-      child: InkWell(
-        onTap: onTap,
+      child: Material(
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(borderRadius),
-        child: Padding(
-          padding: padding,
-          child: child,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(borderRadius),
+          splashColor: theme.colorScheme.primary.withValues(alpha: 0.10),
+          highlightColor: Colors.transparent,
+          child: Padding(
+            padding: padding,
+            child: child,
+          ),
         ),
       ),
     );

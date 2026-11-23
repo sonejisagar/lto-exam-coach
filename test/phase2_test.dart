@@ -142,7 +142,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Ready to practice?'), findsOneWidget);
-    expect(find.text('Preparing for: Car'), findsOneWidget);
+    expect(find.text(settingsProvider.vehicleTypeLabel), findsOneWidget);
     expect(find.text('Continue Practice'), findsOneWidget);
     expect(find.textContaining('Tip of the Day:'), findsOneWidget);
   });

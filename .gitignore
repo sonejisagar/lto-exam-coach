@@ -50,3 +50,10 @@ app.*.map.json
 **/key.properties
 android/key.properties
 
+
+# Play Store marketing materials & screenshots
+play_store_screenshots/
+
+tool/*base64.txt
+tool/*.txt
+android/app/google-services.json

@@ -487,18 +487,17 @@ class RoadSignsData {
     ),
   ];
 
+  static final Map<String, RoadSignModel> _signsById = {
+    for (final s in allSigns) s.id: s,
+  };
+
   static List<RoadSignModel> getSignsByCategory(String category) {
     if (category == 'All') return allSigns;
     return allSigns.where((s) => s.category == category).toList();
   }
 
-  static RoadSignModel? getSignById(String id) {
-    try {
-      return allSigns.firstWhere((s) => s.id == id);
-    } catch (_) {
-      return null;
-    }
-  }
+  /// Returns a specific road sign by its ID in O(1) time, or null if not found.
+  static RoadSignModel? getSignById(String id) => _signsById[id];
 
   static List<RoadSignModel> searchSigns(String query, {String? category}) {
     final cleanQuery = query.trim().toLowerCase();

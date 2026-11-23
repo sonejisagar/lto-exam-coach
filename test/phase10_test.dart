@@ -1,30 +1,29 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lto_exam_coach/config/ad_config.dart';
 import 'package:lto_exam_coach/data/road_signs_data.dart';
+import 'package:lto_exam_coach/services/firebase_service.dart';
 import 'package:lto_exam_coach/services/question_repository.dart';
 
 void main() {
   group('Phase 10 — Production Configuration & Release Readiness Tests', () {
-    test('1. AdConfig isTestMode is enabled by default to prevent unauthorized production ad calls', () {
-      expect(AdConfig.isTestMode, isTrue);
+    test('1. AdConfig production readiness validates that all production ad unit IDs are configured', () {
+      expect(AdConfig.hasValidProductionIds, isTrue);
+      expect(AdConfig.validateProductionConfig(), isEmpty);
     });
 
-    test('2. AdConfig hasValidProductionIds returns false when production IDs are not configured', () {
-      expect(AdConfig.hasValidProductionIds, isFalse);
+    test('2. AdConfig production IDs contain valid AdMob unit IDs', () {
+      expect(AdConfig.prodAndroidBannerId, startsWith('ca-app-pub-'));
+      expect(AdConfig.prodAndroidInterstitialId, startsWith('ca-app-pub-'));
+      expect(AdConfig.prodAndroidAppOpenId, equals('ca-app-pub-4523328156597896/7213325272'));
     });
 
-    test('3. AdConfig validateProductionConfig identifies pending production credentials', () {
-      final pending = AdConfig.validateProductionConfig();
-      expect(pending, isNotEmpty);
-      expect(pending.any((item) => item.contains('Banner')), isTrue);
-      expect(pending.any((item) => item.contains('Interstitial')), isTrue);
-    });
-
-    test('4. AdConfig preserves official Google test ad unit IDs', () {
+    test('3. AdConfig preserves official Google test ad unit IDs including App Open', () {
       expect(AdConfig.testAndroidBannerId, equals('ca-app-pub-3940256099942544/6300978111'));
       expect(AdConfig.testAndroidInterstitialId, equals('ca-app-pub-3940256099942544/1033173712'));
+      expect(AdConfig.testAndroidAppOpenId, equals('ca-app-pub-3940256099942544/9257395921'));
       expect(AdConfig.testIosBannerId, equals('ca-app-pub-3940256099942544/2934735716'));
       expect(AdConfig.testIosInterstitialId, equals('ca-app-pub-3940256099942544/4411468910'));
+      expect(AdConfig.testIosAppOpenId, equals('ca-app-pub-3940256099942544/5575463023'));
     });
 
     test('5. AdConfig privacyPolicyUrl is a verified production HTTPS URL', () {
@@ -50,6 +49,12 @@ void main() {
     test('8. Cooldown configuration guarantees minimum 180 seconds between interstitials', () {
       expect(AdConfig.minSecondsBetweenInterstitials, greaterThanOrEqualTo(180));
       expect(AdConfig.maxInterstitialsPerSession, equals(1));
+    });
+
+    test('9. FirebaseService defaults are safe and adsEnabled is true by default', () {
+      expect(FirebaseService.instance.adsEnabled, isTrue);
+      expect(AdConfig.areAdsEnabled, isTrue);
+      expect(FirebaseService.instance.interstitialCooldownSeconds, equals(180));
     });
   });
 }

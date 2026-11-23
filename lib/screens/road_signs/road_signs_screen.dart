@@ -279,7 +279,10 @@ class _RoadSignsScreenState extends State<RoadSignsScreen> {
             ),
           ),
 
-          const SizedBox(height: 4),
+          // Passive Banner Ad (inline between quiz banner and sign grid)
+          const AdBannerWidget(
+            margin: EdgeInsets.only(top: 4, bottom: 4),
+          ),
 
           // Main Sign Grid / Empty State
           Expanded(
@@ -395,9 +398,6 @@ class _RoadSignsScreenState extends State<RoadSignsScreen> {
                     },
                   ),
           ),
-
-          // Passive Banner Ad
-          const AdBannerWidget(),
         ],
       ),
     );

@@ -3,14 +3,35 @@ import 'package:provider/provider.dart';
 import '../../models/mock_test_result.dart';
 import '../../providers/mock_test_provider.dart';
 import '../../services/ad_service.dart';
+import '../../services/app_update_review_service.dart';
 import '../../utils/constants.dart';
 import '../../widgets/ad_banner.dart';
 import '../../widgets/custom_card.dart';
 import 'mock_test_review_screen.dart';
 import 'mock_test_setup_screen.dart';
 
-class MockTestResultScreen extends StatelessWidget {
+class MockTestResultScreen extends StatefulWidget {
   const MockTestResultScreen({super.key});
+
+  @override
+  State<MockTestResultScreen> createState() => _MockTestResultScreenState();
+}
+
+class _MockTestResultScreenState extends State<MockTestResultScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Mark that the user completed an activity so the review prompt
+    // can be shown next time they open the app.
+    AppUpdateReviewService.instance.markActivityCompleted();
+  }
+
+  @override
+  Widget build(BuildContext context) => const _MockTestResultBody();
+}
+
+class _MockTestResultBody extends StatelessWidget {
+  const _MockTestResultBody();
 
   @override
   Widget build(BuildContext context) {
@@ -231,6 +252,11 @@ class MockTestResultScreen extends StatelessWidget {
               const SizedBox(height: 20),
             ],
 
+            // Passive Banner Ad (inline separator before actions)
+            const AdBannerWidget(
+              margin: EdgeInsets.only(bottom: 20),
+            ),
+
             // Action Buttons: Review Answers, Try Again, Back to Home
             SizedBox(
               width: double.infinity,
@@ -327,10 +353,6 @@ class MockTestResultScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-
-            // Passive Banner Ad
-            const AdBannerWidget(),
-            const SizedBox(height: 8),
           ],
         ),
       ),

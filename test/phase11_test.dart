@@ -124,8 +124,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('GENERAL'), findsOneWidget);
-      expect(find.text('STUDY'), findsOneWidget);
-      expect(find.text('ABOUT'), findsOneWidget);
+      expect(find.textContaining('STUDY'), findsOneWidget);
+      expect(find.textContaining('ABOUT'), findsOneWidget);
       expect(find.text('Language'), findsOneWidget);
       expect(find.text('English'), findsOneWidget);
     });
@@ -152,7 +152,7 @@ void main() {
       expect(find.text('Wrong Answers'), findsOneWidget);
       expect(find.text('Favorites'), findsOneWidget);
       expect(find.text('Difficult Questions'), findsOneWidget);
-      expect(find.text('Road Signs'), findsOneWidget);
+      expect(find.textContaining('Road Signs'), findsOneWidget);
       expect(find.text('Progress & Analytics'), findsOneWidget);
     });
 
@@ -173,9 +173,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('80% Benchmark'), findsOneWidget);
+      expect(find.text('80% Target Score'), findsOneWidget);
       expect(find.text('Practice Benchmark'), findsOneWidget);
-      expect(find.text('Practice only'), findsOneWidget);
+      expect(find.text('Practice Reviewer Notice'), findsOneWidget);
     });
 
     test('10. Default theme is light theme and user can switch to dark theme', () async {

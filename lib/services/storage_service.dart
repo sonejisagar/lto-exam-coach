@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/mock_test_result.dart';
 import '../models/user_progress_model.dart';
@@ -16,61 +17,134 @@ class StorageService {
   static const String keyPracticeProgress = 'lto_practice_progress';
   static const String keyFavoriteSigns = 'lto_favorite_signs';
 
-  final SharedPreferences _prefs;
+  final SharedPreferences? _prefs;
+  final Map<String, Object> _memoryFallback = {};
+
+  SharedPreferences? get prefs => _prefs;
 
   StorageService(this._prefs);
 
+  /// Initializes local storage cleanly. If platform storage fails unexpectedly
+  /// on launch, falls back to safe in-memory storage instead of blocking startup.
   static Future<StorageService> init() async {
-    final prefs = await SharedPreferences.getInstance();
-    return StorageService(prefs);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return StorageService(prefs);
+    } catch (e) {
+      debugPrint('[StorageService] SharedPreferences init failed, using in-memory fallback: $e');
+      return StorageService(null);
+    }
+  }
+
+  String? _getString(String key) {
+    final p = _prefs;
+    if (p != null) return p.getString(key);
+    final v = _memoryFallback[key];
+    return v is String ? v : null;
+  }
+
+  Future<bool> _setString(String key, String value) async {
+    final p = _prefs;
+    if (p != null) return await p.setString(key, value);
+    _memoryFallback[key] = value;
+    return true;
+  }
+
+  bool? _getBool(String key) {
+    final p = _prefs;
+    if (p != null) return p.getBool(key);
+    final v = _memoryFallback[key];
+    return v is bool ? v : null;
+  }
+
+  Future<bool> _setBool(String key, bool value) async {
+    final p = _prefs;
+    if (p != null) return await p.setBool(key, value);
+    _memoryFallback[key] = value;
+    return true;
+  }
+
+  int? _getInt(String key) {
+    final p = _prefs;
+    if (p != null) return p.getInt(key);
+    final v = _memoryFallback[key];
+    return v is int ? v : null;
+  }
+
+  Future<bool> _setInt(String key, int value) async {
+    final p = _prefs;
+    if (p != null) return await p.setInt(key, value);
+    _memoryFallback[key] = value;
+    return true;
+  }
+
+  List<String>? _getStringList(String key) {
+    final p = _prefs;
+    if (p != null) return p.getStringList(key);
+    final v = _memoryFallback[key];
+    return v is List<String> ? v : null;
+  }
+
+  Future<bool> _setStringList(String key, List<String> value) async {
+    final p = _prefs;
+    if (p != null) return await p.setStringList(key, value);
+    _memoryFallback[key] = value;
+    return true;
+  }
+
+  Future<bool> _remove(String key) async {
+    final p = _prefs;
+    if (p != null) return await p.remove(key);
+    _memoryFallback.remove(key);
+    return true;
   }
 
   // Language Preference
-  String get languageCode => _prefs.getString(keyLanguageCode) ?? 'en';
+  String get languageCode => _getString(keyLanguageCode) ?? 'en';
 
   Future<bool> setLanguageCode(String code) async {
-    return await _prefs.setString(keyLanguageCode, code);
+    return await _setString(keyLanguageCode, code);
   }
 
   // Onboarding
   bool get isOnboardingCompleted =>
-      _prefs.getBool(keyOnboardingCompleted) ?? false;
+      _getBool(keyOnboardingCompleted) ?? false;
 
   Future<bool> setOnboardingCompleted(bool completed) async {
-    return await _prefs.setBool(keyOnboardingCompleted, completed);
+    return await _setBool(keyOnboardingCompleted, completed);
   }
 
   // Vehicle Preference
-  String get vehicleType => _prefs.getString(keyVehicleType) ?? 'both';
+  String get vehicleType => _getString(keyVehicleType) ?? 'both';
 
   Future<bool> setVehicleType(String type) async {
-    return await _prefs.setString(keyVehicleType, type);
+    return await _setString(keyVehicleType, type);
   }
 
   // Theme Mode
-  String get themeMode => _prefs.getString(keyThemeMode) ?? 'light';
+  String get themeMode => _getString(keyThemeMode) ?? 'light';
 
   Future<bool> setThemeMode(String mode) async {
-    return await _prefs.setString(keyThemeMode, mode);
+    return await _setString(keyThemeMode, mode);
   }
 
   // Daily Goal
-  int get dailyGoal => _prefs.getInt(keyDailyGoal) ?? 20;
+  int get dailyGoal => _getInt(keyDailyGoal) ?? 20;
 
   Future<bool> setDailyGoal(int goal) async {
-    return await _prefs.setInt(keyDailyGoal, goal);
+    return await _setInt(keyDailyGoal, goal);
   }
 
   // Daily Reminder
-  bool get dailyReminder => _prefs.getBool(keyDailyReminder) ?? false;
+  bool get dailyReminder => _getBool(keyDailyReminder) ?? false;
 
   Future<bool> setDailyReminder(bool enabled) async {
-    return await _prefs.setBool(keyDailyReminder, enabled);
+    return await _setBool(keyDailyReminder, enabled);
   }
 
   // Favorites
   Set<String> getFavorites() {
-    final list = _prefs.getStringList(keyFavorites) ?? [];
+    final list = _getStringList(keyFavorites) ?? [];
     return list.toSet();
   }
 
@@ -85,21 +159,21 @@ class StorageService {
     } else {
       current.add(questionId);
     }
-    return await _prefs.setStringList(keyFavorites, current.toList());
+    return await _setStringList(keyFavorites, current.toList());
   }
 
   Future<bool> removeFavorite(String questionId) async {
     final current = getFavorites();
     if (current.contains(questionId)) {
       current.remove(questionId);
-      return await _prefs.setStringList(keyFavorites, current.toList());
+      return await _setStringList(keyFavorites, current.toList());
     }
     return true;
   }
 
   // Road Sign Favorites (Isolated from Question Favorites)
   Set<String> getFavoriteSignIds() {
-    final list = _prefs.getStringList(keyFavoriteSigns) ?? [];
+    final list = _getStringList(keyFavoriteSigns) ?? [];
     return list.toSet();
   }
 
@@ -114,14 +188,14 @@ class StorageService {
     } else {
       current.add(signId);
     }
-    return await _prefs.setStringList(keyFavoriteSigns, current.toList());
+    return await _setStringList(keyFavoriteSigns, current.toList());
   }
 
   Future<bool> addFavoriteSign(String signId) async {
     final current = getFavoriteSignIds();
     if (!current.contains(signId)) {
       current.add(signId);
-      return await _prefs.setStringList(keyFavoriteSigns, current.toList());
+      return await _setStringList(keyFavoriteSigns, current.toList());
     }
     return true;
   }
@@ -130,14 +204,14 @@ class StorageService {
     final current = getFavoriteSignIds();
     if (current.contains(signId)) {
       current.remove(signId);
-      return await _prefs.setStringList(keyFavoriteSigns, current.toList());
+      return await _setStringList(keyFavoriteSigns, current.toList());
     }
     return true;
   }
 
   // Difficult Questions
   Set<String> getDifficult() {
-    final list = _prefs.getStringList(keyDifficult) ?? [];
+    final list = _getStringList(keyDifficult) ?? [];
     return list.toSet();
   }
 
@@ -152,21 +226,21 @@ class StorageService {
     } else {
       current.add(questionId);
     }
-    return await _prefs.setStringList(keyDifficult, current.toList());
+    return await _setStringList(keyDifficult, current.toList());
   }
 
   Future<bool> removeDifficult(String questionId) async {
     final current = getDifficult();
     if (current.contains(questionId)) {
       current.remove(questionId);
-      return await _prefs.setStringList(keyDifficult, current.toList());
+      return await _setStringList(keyDifficult, current.toList());
     }
     return true;
   }
 
   // Wrong Answers Bank
   Set<String> getWrongAnswerIds() {
-    final list = _prefs.getStringList(keyWrongAnswers) ?? [];
+    final list = _getStringList(keyWrongAnswers) ?? [];
     return list.toSet();
   }
 
@@ -178,7 +252,7 @@ class StorageService {
     final current = getWrongAnswerIds();
     if (!current.contains(questionId)) {
       current.add(questionId);
-      return await _prefs.setStringList(keyWrongAnswers, current.toList());
+      return await _setStringList(keyWrongAnswers, current.toList());
     }
     return true;
   }
@@ -187,18 +261,18 @@ class StorageService {
     final current = getWrongAnswerIds();
     if (current.contains(questionId)) {
       current.remove(questionId);
-      return await _prefs.setStringList(keyWrongAnswers, current.toList());
+      return await _setStringList(keyWrongAnswers, current.toList());
     }
     return true;
   }
 
   Future<bool> clearWrongAnswers() async {
-    return await _prefs.remove(keyWrongAnswers);
+    return await _remove(keyWrongAnswers);
   }
 
   // Mock Test History (Limited to latest 50 attempts)
   List<MockTestResult> getMockTestHistory() {
-    final rawList = _prefs.getStringList(keyMockTestHistory) ?? [];
+    final rawList = _getStringList(keyMockTestHistory) ?? [];
     final List<MockTestResult> results = [];
     for (final item in rawList) {
       try {
@@ -216,12 +290,12 @@ class StorageService {
     // Limit to latest 50 attempts
     final capped = history.take(50).toList();
     final jsonList = capped.map((r) => r.toJson()).toList();
-    return await _prefs.setStringList(keyMockTestHistory, jsonList);
+    return await _setStringList(keyMockTestHistory, jsonList);
   }
 
   // Practice Progress Analytics
   UserProgressModel getPracticeProgress() {
-    final raw = _prefs.getString(keyPracticeProgress);
+    final raw = _getString(keyPracticeProgress);
     if (raw == null || raw.trim().isEmpty) {
       return UserProgressModel.empty();
     }
@@ -235,11 +309,11 @@ class StorageService {
   }
 
   Future<bool> savePracticeProgress(UserProgressModel progress) async {
-    return await _prefs.setString(keyPracticeProgress, progress.toJson());
+    return await _setString(keyPracticeProgress, progress.toJson());
   }
 
   Future<bool> resetPracticeProgress() async {
-    return await _prefs.remove(keyPracticeProgress);
+    return await _remove(keyPracticeProgress);
   }
 
   /// Completely resets all local study data (practice progress, wrong answer bank,
@@ -247,17 +321,20 @@ class StorageService {
   /// while strictly preserving user configuration (language, theme mode, vehicle preference,
   /// daily goal, daily reminder status, and onboarding completion status).
   Future<bool> resetAllStudyData() async {
-    final r1 = await _prefs.remove(keyPracticeProgress);
-    final r2 = await _prefs.remove(keyWrongAnswers);
-    final r3 = await _prefs.remove(keyFavorites);
-    final r4 = await _prefs.remove(keyDifficult);
-    final r5 = await _prefs.remove(keyFavoriteSigns);
-    final r6 = await _prefs.remove(keyMockTestHistory);
+    final r1 = await _remove(keyPracticeProgress);
+    final r2 = await _remove(keyWrongAnswers);
+    final r3 = await _remove(keyFavorites);
+    final r4 = await _remove(keyDifficult);
+    final r5 = await _remove(keyFavoriteSigns);
+    final r6 = await _remove(keyMockTestHistory);
     return r1 && r2 && r3 && r4 && r5 && r6;
   }
 
   // Clear all data
   Future<bool> clearAll() async {
-    return await _prefs.clear();
+    final p = _prefs;
+    if (p != null) return await p.clear();
+    _memoryFallback.clear();
+    return true;
   }
 }

@@ -1,7 +1,18 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
+}
+
+val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
 android {
@@ -23,14 +34,41 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        ndk {
+            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86_64"))
+        }
+    }
+
+    signingConfigs {
+        create("release") {
+            val keyAliasProp = keystoreProperties["keyAlias"] as String?
+            val keyPasswordProp = keystoreProperties["keyPassword"] as String?
+            val storePasswordProp = keystoreProperties["storePassword"] as String?
+            val storeFileProp = keystoreProperties["storeFile"] as String?
+
+            if (keyAliasProp != null && keyPasswordProp != null && storePasswordProp != null && storeFileProp != null) {
+                keyAlias = keyAliasProp
+                keyPassword = keyPasswordProp
+                storePassword = storePasswordProp
+                val keyFile = file(storeFileProp)
+                storeFile = if (keyFile.exists()) keyFile else rootProject.file(storeFileProp)
+            }
+        }
     }
 
     buildTypes {
         release {
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
-            isMinifyEnabled = false
-            isShrinkResources = false
+            val releaseConfig = signingConfigs.getByName("release")
+            signingConfig = if (releaseConfig.storeFile != null && releaseConfig.storeFile!!.exists()) {
+                releaseConfig
+            } else {
+                signingConfigs.getByName("debug")
+            }
+            // Enable R8 full-mode: shrinks, obfuscates & optimises DEX bytecode.
+            // This satisfies Google Play's DEX code optimisation threshold (≥ 25% obfuscation).
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -54,4 +92,3 @@ flutter {
     val junctionCandidate = File("D:/FlutterProjects/lto_exam_coach")
     source = propSource ?: if (junctionCandidate.exists()) junctionCandidate.absolutePath else "../.."
 }
-
